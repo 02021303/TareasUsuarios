@@ -1,0 +1,86 @@
+﻿@page "{id:int}"
+@model WebTarea.Pages.Tareas.EditarModel
+@{
+}
+
+<h2>Editar Tarea</h2>
+<div class="container mt-3 mb-3">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form id="formulario" method="post" asp-page-handler="Editar">
+                <input type="hidden" asp-for="Tarea.Id" />
+
+                <div class="mb-3">
+                    <label for="Titulo" class="form-label">Título</label>
+                    <input type="text" id="Titulo" asp-for="Tarea.Titulo" class="form-control" placeholder="Título"
+                           name="Tarea.Titulo">
+                </div>
+                <div class="mb-3">
+                    <label for="Descripcion" class="form-label">Descripción</label>
+                    <input type="text" asp-for="Tarea.Descripcion" id="Descripcion" class="form-control"
+                           placeholder="Descripción" name="Tarea.Descripcion">
+                </div>
+                <div class="mb-3">
+                    <label for="FechaCreacion" class="form-label">Fecha Creación</label>
+                    <input type="date" id="FechaCreacion" class="form-control" asp-for="Tarea.FechaCreacion"
+                           name="Tarea.FechaCreacion" disabled="false">
+                </div>
+                <div class="mb-3">
+                    <label for="FechaVencimiento" class="form-label">Fecha Vencimiento</label>
+                    <input type="date" id="FechaVencimiento" asp-for="Tarea.FechaVencimiento" class="form-control"
+                           name="Tarea.FechaVencimiento">
+                </div>
+                <button type="submit" class="btn btn-success">Guardar</button>
+
+                <a href="/Tareas/Index" class="btn btn-danger" role="button">Cancelar</a>
+                <div id="resultado">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        //enviar formulario
+       $(document).ready(function () {
+    $("#formulario").submit(function (event) {
+        event.preventDefault();
+        // Validar datos
+        const titulo = document.getElementById('Titulo').value;
+        const fechaVencimiento = document.getElementById('FechaVencimiento').value;
+
+        if (titulo != "" && fechaVencimiento != "") {
+            $.ajax({
+                url: '@Url.Page("/Tareas/Editar", "Editar")',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function (response) {
+                    Swal.fire({
+                        title: "Tarea editada con éxito",
+                        text: "",
+                        icon: "success"
+                    }).then((result) => {
+                        window.location.href = '/Tareas';
+                    });;
+                },
+                error: function (err) {
+                    console.log(err);
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error al editar tarea",
+                        text: err.status + ': ' + err.statusText,
+                        footer: ''
+                    });
+                }
+            });
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "Formulario inválido, completar los datos"
+            });
+        }
+    });
+});
+    </script>
+} 

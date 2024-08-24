@@ -1,0 +1,307 @@
+﻿@page
+@model WebTarea.Pages.Tareas.IndexModel
+@{
+}
+
+<div class="container mb-3">
+    <p>
+    <a href="/Tareas/Crear" class="btn btn-success mt-5" role="button"><i class="bi bi-plus"></i></a>
+</p>
+<div class="row">
+<div class="col-4">
+    <input type="text" id="filterInput" class="form-control" placeholder="Filtrar">
+</div>
+        <div class="col-2 mt-2 ml-3">
+        <label>Completadas</label> <input type="checkbox" id="chkCom" onchange="tareasCompletas()">
+        </div>
+</div>
+</div>
+<div class="container">  
+    <div class="table-responsive" >
+        <table id="tableTareas" class="table table-striped table-bordered" >
+            
+            <thead class="text-center">
+              
+                <tr>
+                    <th>
+                        Titulo
+                    </th>
+                    <th>
+                        Descripci&oacute;n
+                    </th>
+                    <th>
+                        Fecha Creaci&oacute;n
+                    </th>
+                    <th>
+                        Fecha Vencimiento
+                    </th>
+                    <th>
+                        Estado
+                    </th>
+                    <th>
+                        Completar
+                    </th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="listarTareas" class="text-center">
+            </tbody>
+        </table>
+        
+    </div>
+</div>
+
+@* scroll vertical de la tabla *@
+<style>
+    .table-responsive {
+        max-height: 400px;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+</style>
+
+@section Scripts {
+    <script>
+
+//color verde de los botones
+const colorBtns = '#198754';
+
+// filtrar por titulo
+$(document).ready(function () {
+    $('#filterInput').on('keyup', function () {
+        let filterInput = $(this).val();
+        $.ajax({
+            url: '@Url.Page("/Tareas/Index", "FiltroTarea")',
+            type: 'GET',
+            data: { filtro: filterInput },
+            success: function (data) {
+                var $tareasList = $("#listarTareas");
+                $tareasList.empty();
+                $.each(data, function (index, tarea) {
+                    $tareasList.append
+                        (appendTr(tarea));
+                });
+            }
+        });
+    });
+    $.ajax({
+        url: '@Url.Page("/Tareas/Index", "Tareas")',
+        method: 'GET',
+        success: function (data) {
+            if (typeof data === 'object') {
+                var $tareasList = $("#listarTareas");
+                $tareasList.empty();
+                $.each(data, function (index, tarea) {
+                    $tareasList.append
+                        (appendTr(tarea));
+                });
+            } else {
+                console.error('Hubo un error');
+            }
+        },
+        error: function () {
+            alert('Hubo un error al cargar las tareas.');
+        }
+    });
+});
+
+// eliminar una tarea
+function eliminarTarea(id) {
+    let valor = id;
+    return (
+        $.ajax({
+            url: '@Url.Page("/Tareas/Index", "Eliminar")',
+            type: 'GET',
+            data: { id: valor },
+            success: function (response) {
+                if (response.success) {
+                    $.ajax({
+                        url: '@Url.Page("/Tareas/Index", "Tareas")',
+                        method: 'GET',
+                        success: function (data) {
+                            if (typeof data === 'object') {
+                                var $tareasList = $("#listarTareas");
+                                $tareasList.empty();
+                                $.each(data, function (index, tarea) {
+                                    $tareasList.append
+                                        (appendTr(tarea));
+                                });
+                            } else {
+                                console.error('Hubo un error');
+                            }
+                        },
+                        error: function () {
+                            alert('Hubo un error al cargar las tareas.');
+                        }
+                    });
+                    Swal.fire({
+                        title: "Tarea eliminada con éxito",
+                        text: "",
+                        icon: "success",
+                        confirmButtonColor: colorBtns,
+                    });
+                } else {
+                    alert('No se pudo eliminar el ítem.');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error:', error);
+                alert('Error en la solicitud de eliminación.');
+            }
+        }));
+}
+
+//pantalla confirmacion eliminar
+function modalEliminar(id) {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: "Una vez eliminada, no podrás recuperar esta tarea.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: colorBtns,
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            eliminarTarea(id);
+        }
+    });
+}
+
+// pasar estado de boolean a texto
+function verificarEstado(estado) {
+    return estado ? 'Completada' : 'Pendiente';
+}
+
+// dar formato a fechas
+function formatoFecha(fecha) {
+    fecha = new Date(fecha);
+    return fecha.toLocaleDateString('es-CR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    });
+}
+
+// devolver tareas en estado completado o pendiente al quitar seleccion del checkbox
+function tareasCompletas() {
+    if ($('#chkCom').is(":checked")) {
+        $.ajax({
+            url: '@Url.Page("/Tareas/Index", "Tareas")',
+            method: 'GET',
+            success: function (data) {
+                if (typeof data === 'object') {
+                    var $tareasList = $("#listarTareas");
+                    $tareasList.empty();
+                    $.each(data, function (index, tarea) {
+                        if (tarea.estado == true) {
+                            $tareasList.append
+                                (appendTr(tarea));
+                        }
+                    });
+
+                } else {
+                    console.error('Hubo un error');
+                }
+            },
+            error: function () {
+                alert('Hubo un error al cargar las tareas.');
+            }
+        });
+    }
+    else {
+        $.ajax({
+            url: '@Url.Page("/Tareas/Index", "Tareas")',
+            method: 'GET',
+            success: function (data) {
+                if (typeof data === 'object') {
+                    var $tareasList = $("#listarTareas");
+                    $tareasList.empty();
+                    $.each(data, function (index, tarea) {
+                        $tareasList.append
+                            (appendTr(tarea));
+                    });
+                } else {
+                    console.error('Hubo un error');
+                }
+            },
+            error: function () {
+                alert('Hubo un error al cargar las tareas.');
+            }
+        });
+    }
+}
+
+// completar 1 tarea al darle check
+function completarTarea(id) {
+    let valor = id;
+    $.ajax({
+        url: '@Url.Page("/Tareas/Index", "Completar")',
+        type: 'GET',
+        data: { id: valor },
+        success: function (response) {
+            if (response.success) {
+                $.ajax({
+                    url: '@Url.Page("/Tareas/Index", "Tareas")',
+                    method: 'GET',
+                    success: function (data) {
+                        if (typeof data === 'object') {
+                            var $tareasList = $("#listarTareas");
+                            $tareasList.empty();
+                            $.each(data, function (index, tarea) {
+                                $tareasList.append
+                                    (appendTr(tarea));
+                            });
+                        } else {
+                            console.error('Hubo un error');
+                        }
+                    },
+                    error: function () {
+                        alert('Hubo un error al cargar las tareas.');
+                    }
+                });
+            } else {
+                alert('No se pudo eliminar el ítem.');
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('Error:', error);
+            alert('Error en la solicitud de eliminación.');
+        }
+    });
+}
+
+// codigo variable de la tabla para renderizar las tareas
+function appendTr(tarea) {
+    return (`<tr>
+            <td>${tarea.titulo} </td>
+                            <td> ${!tarea.descripcion ? " " : tarea.descripcion}</td >
+                    <td>${formatoFecha(tarea.fechaCreacion)} </td>
+            <td>${formatoFecha(tarea.fechaVencimiento)} </td>
+            <td >${verificarEstado(tarea.estado)}</td>
+                                    <td>    <input type="checkbox" id="chk${tarea.id}" onchange="completarTarea(${tarea.id})" class="status-checkbox" data-id="${tarea.estado}" ${tarea.estado ? "disabled" : ""} ${tarea.estado ? "checked" : ""} /> </td>
+                    <td> 
+            <a href='/Tareas/Editar/${tarea.id}' onclick="actualizarTarea(${tarea.id})" class='btn btn-success'>
+            <i class="bi bi-pencil-square"></i>
+            </a>
+            <a href='#' onclick="modalEliminar(${tarea.id})" class='btn btn-danger'>
+            <i class="bi bi-trash"></i>
+            </a> 
+        </td>
+                        </tr>`);
+}
+
+</script >
+}
+
+
+
+
+
+
