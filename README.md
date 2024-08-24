@@ -25,19 +25,19 @@ update-database-context TareaDbContext
 ## Desplegar a Azure
 
 ### 1. Crear suscripción Azure
-- Crear una suscripción de [Azure](https://portal.azure.com/)
-- La suscripción puede ser una versión de prueba
+- Crear una suscripción de [Azure](https://portal.azure.com/).
+- La suscripción puede ser una versión de prueba.
 ### 2. Crear recurso para Web App
 - Dar click en crear recurso.
 ​- Seleccionar Web App.
 -​ Crear un resource group, en caso de ni existir.
 ​- Seleccionar una región, sistema operativo, nombre del proyecto y habilitar el acceso público. Y dar click en crear.
 ### 3. Configurar proyecto desde Visual Studio
-- abrir la solución en Visual Studio 
-- dar click derecho al proyecto
-- seleccionar publicar
-- Seleccionar Azure
-- Seleccionar Azure App Service Windows
+- Abrir la solución en Visual Studio.
+- Dar click derecho al proyecto.
+- Seleccionar publicar.
+- Seleccionar Azure.
+- Seleccionar Azure App Service Windows.
 - Elegir la suscripcion creada anteriormente.
 ### 4. Configurar base de Datos SQL Server
 Primero debemos asegurarnos que exista un usuario con permisos de administrador en nuestra instancia de base de datos local.
@@ -49,9 +49,33 @@ Primero debemos asegurarnos que exista un usuario con permisos de administrador 
 - Copiar el nombre del servidor desde el portal de Azure.
 - Iniciar sesión de Visual Studio Management Studion con ese nombre del servidor, usuario y contraseña de nuestro usuario creado anteriormente.
 ### 7. Crear tablas de la BD con .NET
-En la consola de .Net o Visual Studio ejecutamos
+En la consola de .Net o Visual Studio ejecutamos:
 ```bash
 update-database-context TareaDbContext
 ```
 Las tablas son creadas y nuestro proyecto estará listo para ser utilizado de manera pública.
-
+### 8. Navegación
+La aplicación permite:
+- Registrar nuevos usuarios
+- Login.
+- Crear tareas.
+- Visualizar lista de tareas.
+- Visualizar solo tareas completadas.
+- Marcar tareas como completadas desde la tabla.
+- Editar tareas.
+- Eliminar tareas.
+- Busqueda de tareas por título.
+- Logout.
+### 8. Tecnologías utilizadas
+- .Net 8.0
+- Entity Framework Core
+- Razor Pages
+- HTML
+- Ajax
+- JQuery
+- SQL Server
+- Azure App Service
+- Azure SQL Database
+- Bootstrap
+- ASP.NET Identity
+  
