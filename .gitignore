@@ -1,0 +1,42 @@
+# Archivos y carpetas de compilación
+bin/
+obj/
+
+# Archivos y carpetas de dependencias
+packages/
+project.lock.json
+project.fragment.lock.json
+*.nupkg
+*.snupkg
+
+# Archivos de configuración del IDE
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Archivos de configuración de Visual Studio Code
+.vscode/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos temporales y de caché
+*.log
+*.tmp
+*.swp
+
+# Archivos de base de datos locales
+*.db
+*.sqlite
+*.sqlite3
+
+# Configuraciones y credenciales sensibles
+secrets.json
+*.pfx
+
+# Archivos de publicación
+publish/
